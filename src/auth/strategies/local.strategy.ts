@@ -1,6 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
+import { UnauthorizedException } from '@nestjs/common';
 
 export class localStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
@@ -11,6 +12,8 @@ export class localStrategy extends PassportStrategy(Strategy) {
 
   // Method to validate the user with provided email and password.
   validate(email: string, password: string) {
+    if (password === '')
+      throw new UnauthorizedException('please proviide your password');
     // Calls the AuthService's validateLocalUser method to verify credentials.
     return this.authService.validateLocalUser(email, password);
 

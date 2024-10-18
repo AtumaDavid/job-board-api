@@ -12,6 +12,8 @@ import refreshConfig from './config/refresh.config';
 import { JwtStrategyRefresh } from './strategies/refresh-token.strategy';
 import { UserService } from 'src/user/user.service';
 import { localStrategy } from './strategies/local.strategy';
+import googleOauthConfig from './config/google-oauth.config';
+import { googleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { localStrategy } from './strategies/local.strategy';
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshConfig),
+    ConfigModule.forFeature(googleOauthConfig),
   ],
   controllers: [AuthController],
   providers: [
@@ -27,6 +30,7 @@ import { localStrategy } from './strategies/local.strategy';
     JwtStrategy,
     JwtStrategyRefresh,
     localStrategy,
+    googleStrategy,
   ],
 })
 export class AuthModule {}
