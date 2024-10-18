@@ -29,6 +29,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Request,
   UseGuards,
@@ -37,6 +38,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth/local-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -50,6 +52,18 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   loginUser(@Request() req) {
-    return this.authService.loginUser(req.user.id, req.user.name);
+    // Extracts the authenticated user's details from the request object.
+    return this.authService.loginUser(
+      req.user.id,
+      req.user.email,
+      req.user.name,
+      req.user.role,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('protected')
+  getAll(@Request() req) {
+    return { message: `now you cann access this api ${req.user.id}` };
   }
 }

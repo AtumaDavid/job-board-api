@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'argon2';
-import { UserRole } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -23,9 +23,21 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
+    if (!email) {
+      throw new Error('Email is required');
+    }
+
     return await this.prisma.user.findUnique({
       where: {
-        email,
+        email: email,
+      },
+    });
+  }
+
+  async findOne(userId: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        id: userId,
       },
     });
   }
