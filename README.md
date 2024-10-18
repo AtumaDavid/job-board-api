@@ -8,6 +8,8 @@
 - npm i -D @types/passport-local
 - nest g gu auth/guards/local-auth ---guards----
 - npm i @nestjs/jwt @nestjs/config
+- npm i passport-jwt
+- npm i -D @types/passport-jwt
 
 ## Description
 
@@ -45,27 +47,79 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Resources
+## Auth Flow
 
-Check out a few resources that may come in handy when working with NestJS:
+1. ### Signup Flow
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+#### Client Sends a Signup Request:
 
-## Support
+- A POST request is made to the `/auth/signup` endpoint with the user’s email and password.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+#### AuthController Handles the Request:
 
-## Stay in touch
+- The registerUser method in the AuthController receives the request.
+- It extracts the data from the request body, validates it using the ValidationPipe, and forwards it to AuthService.registerUser().
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+#### AuthService Creates the User:
+
+- The AuthService checks if a user with the same email exists by calling UserService.findByEmail().
+- If no user exists, it creates the user using UserService.create().
+- The new user is now registered.
+
+#### Response:
+
+- The user receives a success response confirming the registration.
+
+2. ### Login Flow with Guard Protection
+
+#### Client Sends a Login Request:
+
+- The client sends a POST request to `/auth/login` with an email and password in the request body.
+
+#### LocalAuthGuard is Triggered:
+
+- The loginUser() method in AuthController is protected by the LocalAuthGuard.
+- When the request hits `/auth/login`, LocalAuthGuard.canActivate() is executed first to validate the user before the controller handles the request.
+
+#### canActivate() in LocalAuthGuard Validates the User:
+
+- The guard extracts the email and password from the request.
+- It calls AuthService.validateLocalUser() to validate the user’s credentials.
+
+#### AuthService Validates the Credentials:
+
+- In validateLocalUser(), the service:
+  - Finds the user by email using UserService.findByEmail().
+  - If found, it verifies the password using argon2.verify().
+  - If credentials are valid, it returns the user’s ID and email.
+
+#### Request Object is Updated by the Guard:
+
+- If the user is valid, LocalAuthGuard attaches the user object to the request (via request.user = user).
+- The request now contains the authenticated user’s data, and canActivate() returns true, allowing the request to proceed to the controller.
+
+#### AuthController Handles the Login:
+
+- Now that the guard has validated the user, the AuthController.loginUser() method is called.
+- It receives the authenticated user from the request object.
+
+#### AuthService Generates the JWT Token:
+
+- Inside loginUser(), the AuthService.generateTokens() method creates a JWT token with the user’s ID (sub field).
+- The response includes the JWT token, user ID, and email.
+
+#### Response:
+
+- The client receives a response with the user’s ID, email, and access token.
+
+Client → Sends POST /auth/login (with email & password)
+LocalAuthGuard → Triggers canActivate()
+AuthService → validateLocalUser(email, password)
+Verifies user’s existence and password.
+LocalAuthGuard → Attaches user to request.user.
+AuthController → Calls loginUser() method.
+AuthService → Generates JWT token.
+AuthController → Sends response (user ID, email, access token).
 
 ## License
 
