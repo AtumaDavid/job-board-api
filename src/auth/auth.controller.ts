@@ -93,4 +93,10 @@ export class AuthController {
   async googleCallback(@Request() req) {
     console.log('google user', req.user);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('signout')
+  signout(@Request() req) {
+    return this.authService.signOut(req.user.id);
+  }
 }
