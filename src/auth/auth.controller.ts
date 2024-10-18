@@ -39,6 +39,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
+import { RefrestAuthGuard } from './guards/refrest-auth/refrest-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -58,6 +59,8 @@ export class AuthController {
       req.user.email,
       req.user.name,
       req.user.role,
+      req.user.createdAt,
+      req.user.updatedAt,
     );
   }
 
@@ -65,5 +68,18 @@ export class AuthController {
   @Get('protected')
   getAll(@Request() req) {
     return { message: `now you cann access this api ${req.user.id}` };
+  }
+
+  @UseGuards(RefrestAuthGuard)
+  @Post('refresh')
+  refreshToken(@Request() req) {
+    return this.authService.refreshToken(
+      req.user.id,
+      req.user.email,
+      req.user.name,
+      req.user.role,
+      req.user.createdAt,
+      req.user.updatedAt,
+    );
   }
 }
