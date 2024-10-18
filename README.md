@@ -10,6 +10,8 @@
 - npm i @nestjs/jwt @nestjs/config
 - npm i passport-jwt
 - npm i -D @types/passport-jwt
+- npm i passport-google-oauth20
+- npm i -D @types/passport-google-oauth20
 
 ## Description
 

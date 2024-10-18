@@ -40,6 +40,7 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { RefrestAuthGuard } from './guards/refrest-auth/refrest-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -81,5 +82,15 @@ export class AuthController {
       req.user.createdAt,
       req.user.updatedAt,
     );
+  }
+
+  @UseGuards(GoogleAuthGuard)
+  @Get('google/login')
+  async googleLogin() {}
+
+  @UseGuards(GoogleAuthGuard)
+  @Get('google/callback')
+  async googleCallback(@Request() req) {
+    console.log('google user', req.user);
   }
 }
