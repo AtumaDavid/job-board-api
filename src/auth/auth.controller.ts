@@ -32,6 +32,7 @@ import {
   Get,
   Post,
   Request,
+  SetMetadata,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -41,6 +42,7 @@ import { LocalAuthGuard } from './guards/local-auth/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { RefrestAuthGuard } from './guards/refrest-auth/refrest-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
+import { Public } from './decorators/public.decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -51,6 +53,7 @@ export class AuthController {
     return this.authService.registerUser(createUserDto);
   }
 
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   loginUser(@Request() req) {
@@ -65,12 +68,13 @@ export class AuthController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('protected')
   getAll(@Request() req) {
     return { message: `now you cann access this api ${req.user.id}` };
   }
 
+  @Public()
   @UseGuards(RefrestAuthGuard)
   @Post('refresh')
   refreshToken(@Request() req) {
@@ -84,17 +88,19 @@ export class AuthController {
     );
   }
 
+  @Public()
   @UseGuards(GoogleAuthGuard)
   @Get('google/login')
   async googleLogin() {}
 
+  @Public()
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
   async googleCallback(@Request() req) {
     console.log('google user', req.user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('signout')
   signout(@Request() req) {
     return this.authService.signOut(req.user.id);
