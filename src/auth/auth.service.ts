@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { verify } from 'argon2';
+import { hash, verify } from 'argon2';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import { AuthJwtPayload } from './types/auth-jwtpayload';
@@ -62,6 +62,8 @@ export class AuthService {
     updatedAt: Date,
   ) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const hashedRefreshToken = await hash(refreshToken);
+    await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
     return {
       userId,
       // userName: name,
@@ -93,13 +95,21 @@ export class AuthService {
     return currentUser;
   }
 
-  async validateRefreshToken(userId: string) {
+  async validateRefreshToken(userId: string, refreshToken: string) {
     const user = await this.userService.findOne(userId);
     if (!user) throw new UnauthorizedException('User not found');
+
+    const refreshTokenMatched = await verify(
+      user.hashedRefreshToken,
+      refreshToken,
+    );
+    if (!refreshTokenMatched)
+      throw new UnauthorizedException('Invalid refresh token');
     const currentUser = { id: user.id };
     return currentUser;
   }
 
+  // ----------REFRESH TOKEN------------
   async refreshToken(
     userId: string,
     email: string,
@@ -109,6 +119,8 @@ export class AuthService {
     updatedAt: Date,
   ) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const hashedRefreshToken = await hash(refreshToken);
+    await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
     return {
       userId,
       // userName: name,
@@ -126,5 +138,9 @@ export class AuthService {
     const user = await this.userService.findByEmail(googleUser.email);
     if (user) return user;
     return await this.userService.create(googleUser);
+  }
+
+  async signOut(userId: string) {
+    return await this.userService.updateHashedRefreshToken(userId, null);
   }
 }
