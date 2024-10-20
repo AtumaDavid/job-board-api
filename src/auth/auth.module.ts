@@ -16,6 +16,7 @@ import googleOauthConfig from './config/google-oauth.config';
 import { googleStrategy } from './strategies/google.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
+import { RolesGuardGuard } from './guards/roles/roles.guard/roles.guard.guard';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
     localStrategy,
     googleStrategy,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuardGuard },
   ],
 })
 export class AuthModule {}
