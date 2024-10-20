@@ -43,6 +43,8 @@ import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { RefrestAuthGuard } from './guards/refrest-auth/refrest-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 import { Public } from './decorators/public.decorators';
+import { Roles } from './decorators/roles.decorators';
+import { RolesGuardGuard } from './guards/roles/roles.guard/roles.guard.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -69,6 +71,8 @@ export class AuthController {
   }
 
   // @UseGuards(JwtAuthGuard)
+  @Roles('ADMIN')
+  @UseGuards(RolesGuardGuard)
   @Get('protected')
   getAll(@Request() req) {
     return { message: `now you cann access this api ${req.user.id}` };
