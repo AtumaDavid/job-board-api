@@ -9,7 +9,7 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import { AuthJwtPayload } from './types/auth-jwtpayload';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import refreshConfig from './config/refresh.config';
 import { ConfigType } from '@nestjs/config';
 
