@@ -22,7 +22,7 @@ export class CreateUserDto {
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
   password: string;
 
-  @IsOptional()
-  @IsEnum(UserRole, { message: 'user must be User or admin' })
-  role?: UserRole;
+  // @IsOptional()
+  // @IsEnum(UserRole, { message: 'user must be User or admin' })
+  // role?: UserRole;
 }

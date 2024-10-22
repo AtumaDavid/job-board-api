@@ -12,6 +12,7 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -55,5 +56,22 @@ export class UserController {
       orderBy,
       currentUserRole,
     });
+  }
+
+  // ----------update user-------
+  @Patch(':id')
+  update(
+    @Param('id') userId: string,
+    @Body() updateData: Prisma.UserCreateInput,
+    @Req() req: Request,
+  ) {
+    // const currentUserRole: UserRole =
+    return this.userService.update(userId, updateData);
+  }
+
+  // ---------- Delete User ----------
+  @Delete(':id')
+  async delete(@Param('id') userId: string) {
+    return this.userService.delete(userId);
   }
 }
